@@ -1,37 +1,42 @@
 package task1;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ChargingStation {
-	    private int capacity; // Number of charging spots
-	    private List<Car> cars; // Cars at the station
+    private final int slots = 5;
+    private final EnergyManagement energyManagement;
+    private final CarQueue carQueue;
+    private final ExecutorService chargingSlots;
+    private final ChargingStationGUI gui;
 
-	    public ChargingStation(int capacity) {
-	        this.capacity = capacity;
-	        this.cars = new ArrayList<>();
-	    }
+    public ChargingStation(EnergyManagement energyManagement, CarQueue carQueue, ChargingStationGUI gui) {
+        this.energyManagement = energyManagement;
+        this.carQueue = carQueue;
+        this.gui = gui;
+        this.chargingSlots = Executors.newFixedThreadPool(slots);
+    }
 
-	    public void chargeCar(Car car) throws ChargingExceptions {
-	        try {
-	            if (cars.size() < capacity) {
-	                cars.add(car);
-	                // Simulate charging process
-	                Thread.sleep(car.getChargingTime());
-	            } else {
-	                throw new ChargingExceptions("No available charging spots.");
-	            }
-	        } catch (InterruptedException e) {
-	            // Re-throwing an exception (Feature b
-	            throw new ChargingExceptions("Charging was interrupted", e);
-	        } catch (ChargingExceptions e) {
-	            // Chaining exceptions (Feature d)
-	            throw new ChargingExceptions("Failed to charge the car: " + car, e);
-	        } finally {
-	            // Resource management, ensuring the car is always removed (Feature c)
-	            cars.remove(car);
-	        }
-	    }
-	};
+    public void startChargingProcess() {
+        for (int i = 0; i < slots; i++) {
+            final int slot = i;
+            chargingSlots.submit(() -> chargeCar(slot));
+        }
+    }
 
-
-
+    private void chargeCar(int slot) {
+        while (true) {
+            Car car = carQueue.getNextCar();
+            if (car != null) {
+                String energySource = energyManagement.getCurrentEnergySource();
+                gui.updateChargingSlot(slot, "Occupied by " + car.getLicensePlate() + " using " + energySource);
+                try {
+                    Thread.sleep(5000); // Charging time
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                gui.updateChargingSlot(slot, "Empty");
+                carQueue.returnCar(car);
+            }
+        }
+    }
+}

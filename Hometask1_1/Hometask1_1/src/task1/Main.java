@@ -1,16 +1,18 @@
 package task1;
 
+import javax.swing.SwingUtilities;
+
 public class Main {
-	  public static void main(String[] args) {
-	        ChargingStation station = new ChargingStation(5);
-	        Car car1 = new Car(5000, 1000);
-	        try {
-	            station.chargeCar(car1);
-	        } catch (ChargingExceptions e) {
-	            System.err.println("Error: " + e.getMessage());
-	            	        }
-	    }
-	};
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            ChargingStationGUI gui = new ChargingStationGUI();
 
+            Weather weather = new Weather(gui);
+            EnergyManagement energyManagement = new EnergyManagement(weather, gui);
+            CarQueue carQueue = new CarQueue(gui);
+            ChargingStation station = new ChargingStation(energyManagement, carQueue, gui);
 
-
+            station.startChargingProcess();
+        });
+    }
+}

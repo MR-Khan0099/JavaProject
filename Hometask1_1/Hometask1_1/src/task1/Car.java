@@ -1,20 +1,13 @@
 package task1;
 
 public class Car {
-	    private int chargingTime; // in milliseconds
-	    private int maxWaitTime; // in milliseconds
+    private final String licensePlate;
 
-	    public Car(int chargingTime, int maxWaitTime) {
-	        this.chargingTime = chargingTime;
-	        this.maxWaitTime = maxWaitTime;
-	    }
+    public Car(String licensePlate) {
+        this.licensePlate = licensePlate;
+    }
 
-	    public int getChargingTime() {
-	        return chargingTime;
-	    }
-
-	    public int getMaxWaitTime() {
-	        return maxWaitTime;
-	    }
-	};
-
+    public String getLicensePlate() {
+        return licensePlate;
+    }
+}
