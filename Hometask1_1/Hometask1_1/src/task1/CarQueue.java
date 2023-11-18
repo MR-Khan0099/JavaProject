@@ -6,7 +6,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class CarQueue {
     private final Queue<Car> cars = new ConcurrentLinkedQueue<>();
     private ChargingStationGUI gui;
-
+    public void setGUI(ChargingStationGUI gui) {
+        this.gui = gui;
+        gui.updateQueue(getQueueSize()); // Update queue size on GUI
+    }
     public CarQueue(ChargingStationGUI gui) {
         this.gui = gui;
         // Initialize with 10 cars
@@ -19,6 +22,15 @@ public class CarQueue {
         Car car = cars.poll();
         gui.updateQueue(cars.size());
         return car;
+    }
+
+    public void addCar(Car car) {
+        cars.offer(car);
+        gui.updateQueue(cars.size());
+    }
+
+    public int getQueueSize() {
+        return cars.size();
     }
 
     public void returnCar(Car car) {

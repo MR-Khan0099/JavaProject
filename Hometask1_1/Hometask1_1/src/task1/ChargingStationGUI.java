@@ -9,8 +9,12 @@ public class ChargingStationGUI {
     private JLabel energySourceLabel;
     private JLabel queueLabel;
     private JLabel[] chargingSlots;
+    private JTextField newCarTextField;
+    private JButton addCarButton;
+    private CarQueue carQueue; // Reference to the CarQueue
 
-    public ChargingStationGUI() {
+    public ChargingStationGUI(CarQueue carQueue) {
+        this.carQueue = carQueue;
         initialize();
     }
 
@@ -38,6 +42,28 @@ public class ChargingStationGUI {
         frame.add(chargingPanel);
 
         frame.setVisible(true);
+        // Add car section
+        JPanel addCarPanel = new JPanel(new FlowLayout());
+        newCarTextField = new JTextField(10);
+        addCarButton = new JButton("Add Car");
+        addCarPanel.add(newCarTextField);
+        addCarPanel.add(addCarButton);
+
+        frame.add(addCarPanel);
+
+        // Action listener for the button
+        addCarButton.addActionListener(e -> addCarToQueue());
+
+        frame.setVisible(true);
+    }
+    
+    private void addCarToQueue() {
+        String licensePlate = newCarTextField.getText().trim();
+        if (!licensePlate.isEmpty()) {
+            carQueue.addCar(new Car(licensePlate));
+            updateQueue(carQueue.getQueueSize());
+            newCarTextField.setText(""); // Clear the text field
+        }
     }
 
     public void updateWeather(String weather) {
